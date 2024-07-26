@@ -1,86 +1,19 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice App</title>
-    Bootstrap CSS
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        table {
-            background-color: #ffffff;
-        }
-        th, td {
-            text-align: center;
-            vertical-align: middle;
-        }
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        #description{
-            width: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="text-center">Invoice</h1>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="invoiceTable">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Item ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>CGST (%)</th>
-                        <th>SGST (%)</th>
-                        <th>Discount (%)</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="9">
-                            <input id="itemId" class="form-control" placeholder="Enter Item ID" onchange="fetchItemDetails()">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    Bootstrap JS and dependencies
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invoice App</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+    
     <style>
         body {
             background-color: #f8f9fa;
-            padding: 20px;
+            padding: 50px;
         }
 
         h1 {
@@ -94,7 +27,6 @@
         th,
         td {
             text-align: center;
-            vertical-align: middle;
         }
 
         input {
@@ -125,12 +57,21 @@
             padding-right: 40px;
             /* Space for icon */
         }
+
+        .modal-body {
+            margin-right: 18px;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="text-center">Invoice</h1>
+    <!-- <div class="container"> -->
+        <div class="d-flex justify-content-between">
+            <h1 class="text-center">Invoice</h1>
+            <button id="addItemBtn" class="btn btn-primary my-3" data-toggle="modal" data-target="#addItemModal">
+                + Add Item
+            </button>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered table-hover" id="invoiceTable">
                 <thead class="thead-dark">
@@ -141,19 +82,18 @@
                         <th>Price</th>
                         <th>CGST (%)</th>
                         <th>SGST (%)</th>
-                        <th>Discount (%)</th>
+                        <th>Discount Type</th>
+                        <th>Discount Value</th>
                         <th>Quantity</th>
+                        <th>Actions</th>
                         <th>Total</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="invoiceTableBody">
                     <tr>
-                        <td colspan="9">
+                        <td colspan="11">
                             <div class="icon-container">
-                                <input id="itemId" class="form-control" placeholder="Enter Item ID"
-                                    onchange="fetchItemDetails()">
-                                <button id="addItemBtn" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#addItemModal">+</button>
+                                <input id="searchTerm" class="form-control" placeholder="Enter Item ID or Name" onchange="fetchItemDetails()" />
                             </div>
                         </td>
                     </tr>
@@ -161,11 +101,10 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    <!-- </div> -->
 
-    <!-- Bootstrap Modal -->
-    <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel"
-        aria-hidden="true">
+    <!--Add Item Bootstrap Modal -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -174,42 +113,85 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body ps-0">
                     <form id="addItemForm">
-                        <div class="form-group">
-                            <label for="newItemId">Item ID</label>
-                            <input id="newItemId" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemId" class="col-sm-3">Item ID</label>
+                            <input id="newItemId" class="form-control col-sm-9" />
                         </div>
-                        <div class="form-group">
-                            <label for="newItemName">Name</label>
-                            <input type="text" id="newItemName" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemName" class="col-sm-3">Name</label>
+                            <input type="text" id="newItemName" class="form-control col-sm-9" />
                         </div>
-                        <div class="form-group">
-                            <label for="newItemDescription">Description</label>
-                            <input type="text" id="newItemDescription" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemDescription" class="col-sm-3">Description</label>
+                            <input type="text" id="newItemDescription" class="form-control col-sm-9" />
                         </div>
-                        <div class="form-group">
-                            <label for="newItemPrice">Price</label>
-                            <input id="newItemPrice" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemPrice" class="col-sm-3">Price</label>
+                            <input id="newItemPrice" class="form-control col-sm-9" />
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="newItemCgst">CGST (%)</label>
-                            <input type="number" id="newItemCgst" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemCgst" class="col-sm-3">CGST (%)</label>
+                            <input id="newItemCgst" class="form-control col-sm-9" />
                         </div>
-                        <div class="form-group">
-                            <label for="newItemSgst">SGST (%)</label>
-                            <input type="number" id="newItemSgst" class="form-control">
+                        <div class="form-group row">
+                            <label for="newItemSgst" class="col-sm-3">SGST (%)</label>
+                            <input id="newItemSgst" class="form-control col-sm-9" />
                         </div>
-                        <div class="form-group">
-                            <label for="newItemDiscount">Discount (%)</label>
-                            <input type="number" id="newItemDiscount" class="form-control">
-                        </div> -->
                         <button type="submit" class="btn btn-primary">Add Item</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1" role="dialog">
+    <!-- Modal content -->
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Item</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editItemForm">
+            <div class="form-group row">
+              <label for="editItemId" class="col-sm-3">Item ID</label>
+              <input type="text" id="editItemId" class="form-control col-sm-9" readonly>
+            </div>
+            <div class="form-group row">
+              <label for="editItemName" class="col-sm-3">Name</label>
+              <input type="text" id="editItemName" class="form-control col-sm-9">
+            </div>
+            <div class="form-group row">
+              <label for="editItemDescription" class="col-sm-3">Description</label>
+              <input type="text" id="editItemDescription" class="form-control col-sm-9">
+            </div>
+            <div class="form-group row">
+              <label for="editItemPrice" class="col-sm-3">Price</label>
+              <input id="editItemPrice" class="form-control col-sm-9">
+            </div>
+            <div class="form-group row">
+              <label for="editItemCgst" class="col-sm-3">CGST</label>
+              <input id="editItemCgst" class="form-control col-sm-9">
+            </div>
+            <div class="form-group row">
+              <label for="editItemSgst" class="col-sm-3">SGST</label>
+              <input id="editItemSgst" class="form-control col-sm-9">
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div id="alertMessage" style="display:none;" class="alert alert-danger"></div> -->
+  
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

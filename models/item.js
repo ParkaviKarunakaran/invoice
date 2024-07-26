@@ -2,14 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const Item = sequelize.define(
     "items",
     {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
       item_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
       },
       name: {
         type: DataTypes.STRING,
@@ -20,13 +17,25 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       price: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DECIMAL,
+        allowNull: false,
+      },
+      cgst: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
+      },
+      sgst: {
+        type: DataTypes.DECIMAL,
         allowNull: false,
       },
     },
     {
       tableName: "items",
       timestamps: false,
+    },
+    {
+      tableName: "items",
+      id: false,
     }
   );
 
